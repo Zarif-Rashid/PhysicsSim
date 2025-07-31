@@ -66,8 +66,9 @@ def draw_walls():
     wall_list = [left, right, top, bottom]
     return wall_list
 
-ball1 = Ball(WIDTH/4,HEIGHT/4 + 100,5,'white', 50, 1, 0, 4.4, 1)
-ball2 = Ball(WIDTH/2, HEIGHT/2, 10, 'red', 80, 0.9, 0, 0, 2)
+ball1 = Ball(WIDTH/4,HEIGHT/4 + 100,5,'white', 50, 1, 0, 4.4, 1)    
+ball2 = Ball(WIDTH/2+200, HEIGHT/4 + 100, 5, 'blue', 50, 1, 0, -4.4, 2)
+ball_main = Ball(WIDTH/2, HEIGHT/2, 10, 'red', 80, 0.9, 0, 0, 3)
 
 
 run = True
@@ -77,13 +78,17 @@ while run:
     walls = draw_walls()
     ball1.draw()  # Draw the ball
     ball1.update_pos()
-    # ball1.y_speed = ball1.check_gravity()  # Check gravity and update ball position
-    ball1.y_speed = ball1.gravity_pull(ball2)[0]  # Apply gravity pull from the second ball
-    ball1.x_speed = ball1.gravity_pull(ball2)[1]  # Apply gravity pull from the second ball
-    print(f"Ball 1 Position: ({ball1.x_pos}, {ball1.y_pos}), Speed: ({ball1.x_speed}, {ball1.y_speed})")
     ball2.draw()  # Draw the second ball
+    ball2.update_pos()
+    # ball1.y_speed = ball1.check_gravity()  # Check gravity and update ball position
+    ball1.y_speed = ball1.gravity_pull(ball_main)[0]  # Apply gravity pull from the second ball
+    ball1.x_speed = ball1.gravity_pull(ball_main)[1]  # Apply gravity pull from the second ball
+    ball2.y_speed = ball2.gravity_pull(ball_main)[0]  # Apply gravity pull from the second ball
+    ball2.x_speed = ball2.gravity_pull(ball_main)[1]  # Apply gravity pull from the second ball
+    print(f"Ball 1 Position: ({ball1.x_pos}, {ball1.y_pos}), Speed: ({ball1.x_speed}, {ball1.y_speed})")
+    ball_main.draw()  # Draw the second ball
 
-    text_surface = font.render(f"x_speed: {ball1.x_speed:.2f}, y_speed: {ball1.y_speed:.2f}, acc: {ball1.gravity_pull(ball2)[2]:.2f}, Force: {ball1.mass*ball1.gravity_pull(ball2)[2]:.2f}", True, "white")
+    text_surface = font.render(f"x_speed: {ball1.x_speed:.2f}, y_speed: {ball1.y_speed:.2f}, acc: {ball1.gravity_pull(ball_main)[2]:.2f}, Force: {ball1.mass*ball1.gravity_pull(ball_main)[2]:.2f}", True, "aqua")
     screen.blit(text_surface, (10, 10))
 
     for event in pygame.event.get():
