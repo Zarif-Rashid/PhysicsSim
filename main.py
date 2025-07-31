@@ -2,17 +2,18 @@ import pygame
 pygame.init()
 
 WIDTH, HEIGHT = 1500, 800
-fps = 165
+fps = 60
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 timer = pygame.time.Clock()
 
 # game constants
 wall_thickness = 10
-gravity = 0.4  # Gravity constant
+gravity = 9.81*0.01  # Gravitational field strength 
+G = 10e9  # Gravitational constant
 bounce_stop = 0.6  # Speed threshold for bouncing to stop
 
 class Ball:
-    def __init__(self, x_pos, y_pos, radius, color, mass, retention, y_speed, x_speed, id):
+    def __init__(self, x_pos, y_pos, radius, color, mass, retention, x_speed, y_speed, id):
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.radius = radius
@@ -39,6 +40,16 @@ class Ball:
 
         return self.y_speed
     
+    def gravity_pull(self, other_ball):
+        sqrt_dist = (self.x_pos - other_ball.x_pos) ** 2 + (self.y_pos - other_ball.y_pos) ** 2
+        acc = (G * other_ball.mass) / (sqrt_dist)
+        acc_y = acc * (other_ball.y_pos - self.y_pos) / sqrt_dist**2
+        acc_x = acc * (other_ball.x_pos - self.x_pos) / sqrt_dist**2
+        self.y_speed += acc_y
+        self.x_speed += acc_x
+
+        return [self.y_speed, self.x_speed]
+    
     def update_pos(self):
         self.y_pos += self.y_speed
         self.x_pos += self.x_speed
@@ -51,8 +62,8 @@ def draw_walls():
     wall_list = [left, right, top, bottom]
     return wall_list
 
-ball1 = Ball(50,50,15,'white', 50, 0.9, 0, 0, 1)
-ball2 = Ball(WIDTH/2, HEIGHT/2, 30, 'red', 100, 0.9, 0, 0, 2)
+ball1 = Ball(50,50,5,'white', 50, 1, 0, 2.5, 1)
+ball2 = Ball(WIDTH/2, HEIGHT/2, 10, 'red', 80, 0.9, 0, 0, 2)
 
 
 run = True
@@ -62,7 +73,10 @@ while run:
     walls = draw_walls()
     ball1.draw()  # Draw the ball
     ball1.update_pos()
-    ball1.y_speed = ball1.check_gravity()  # Check gravity and update ball position
+    # ball1.y_speed = ball1.check_gravity()  # Check gravity and update ball position
+    ball1.y_speed = ball1.gravity_pull(ball2)[0]  # Apply gravity pull from the second ball
+    ball1.x_speed = ball1.gravity_pull(ball2)[1]  # Apply gravity pull from the second ball
+    print(f"Ball 1 Position: ({ball1.x_pos}, {ball1.y_pos}), Speed: ({ball1.x_speed}, {ball1.y_speed})")
     ball2.draw()  # Draw the second ball
 
 
