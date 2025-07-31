@@ -1,9 +1,12 @@
 import pygame
 import math
 pygame.init()
+pygame.font.init()
+
+font = pygame.font.SysFont('Arial', 20)
 
 WIDTH, HEIGHT = 1600, 1000
-fps = 120
+fps = 60
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 timer = pygame.time.Clock()
 
@@ -49,7 +52,7 @@ class Ball:
         self.y_speed += acc_y
         self.x_speed += acc_x
 
-        return [self.y_speed, self.x_speed]
+        return [self.y_speed, self.x_speed, acc]
     
     def update_pos(self):
         self.y_pos += self.y_speed
@@ -63,7 +66,7 @@ def draw_walls():
     wall_list = [left, right, top, bottom]
     return wall_list
 
-ball1 = Ball(WIDTH/4,HEIGHT/4,5,'white', 50, 1, 0, 4.4, 1)
+ball1 = Ball(WIDTH/4,HEIGHT/4 + 100,5,'white', 50, 1, 0, 4.4, 1)
 ball2 = Ball(WIDTH/2, HEIGHT/2, 10, 'red', 80, 0.9, 0, 0, 2)
 
 
@@ -80,6 +83,8 @@ while run:
     print(f"Ball 1 Position: ({ball1.x_pos}, {ball1.y_pos}), Speed: ({ball1.x_speed}, {ball1.y_speed})")
     ball2.draw()  # Draw the second ball
 
+    text_surface = font.render(f"x_speed: {ball1.x_speed:.2f}, y_speed: {ball1.y_speed:.2f}, acc: {ball1.gravity_pull(ball2)[2]:.2f}, Force: {ball1.mass*ball1.gravity_pull(ball2)[2]:.2f}", True, "white")
+    screen.blit(text_surface, (10, 10))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
