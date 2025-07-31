@@ -51,7 +51,8 @@ def draw_walls():
     wall_list = [left, right, top, bottom]
     return wall_list
 
-ball1 = Ball(50,50,30,'white', 100, 0.9, 0, 0, 1)
+ball1 = Ball(50,50,15,'white', 50, 0.9, 0, 0, 1)
+ball2 = Ball(WIDTH/2, HEIGHT/2, 30, 'red', 100, 0.9, 0, 0, 2)
 
 
 run = True
@@ -62,6 +63,7 @@ while run:
     ball1.draw()  # Draw the ball
     ball1.update_pos()
     ball1.y_speed = ball1.check_gravity()  # Check gravity and update ball position
+    ball2.draw()  # Draw the second ball
 
 
     for event in pygame.event.get():
