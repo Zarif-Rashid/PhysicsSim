@@ -6,14 +6,14 @@ pygame.font.init()
 font = pygame.font.SysFont('Arial', 20)
 
 WIDTH, HEIGHT = 1600, 1000
-fps = 90
+fps = 165
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 timer = pygame.time.Clock()
 
 # game constants
 wall_thickness = 10
 gravity = 9.81*0.01  # Gravitational field strength 
-G = 6.67e1  # Gravitational constant
+G = 6.67e1*1.5  # Gravitational constant
 bounce_stop = 0.6  # Speed threshold for bouncing to stop
 
 class Ball:
@@ -70,7 +70,8 @@ ball1 = Ball(WIDTH/4,HEIGHT/4 + 100,5,'white', 50, 1, 0, 4.6, 1)
 ball2 = Ball(WIDTH/2+200, HEIGHT/4 + 100, 5, 'blue', 50, 1, 0, -5, 2)
 
 ball_main = Ball(WIDTH/2, HEIGHT/2, 10, 'red', 80, 0.9, 0, 0, 3)
-tracer_points = []
+tracer1_points = []
+tracer2_points = []
 
 
 run = True
@@ -90,11 +91,13 @@ while run:
     print(f"Ball 1 Position: ({ball1.x_pos}, {ball1.y_pos}), Speed: ({ball1.x_speed}, {ball1.y_speed})")
     ball_main.draw()  # Draw the second ball
 
-    tracer_points.append((int(ball1.x_pos), int(ball1.y_pos)))
+    tracer1_points.append((int(ball1.x_pos), int(ball1.y_pos)))
+    tracer2_points.append((int(ball2.x_pos), int(ball2.y_pos)))
 
-    for point in tracer_points:
+    for point in tracer1_points:
         pygame.draw.circle(screen, "yellow", point, 2)  # Small yellow dot
-
+    for point in tracer2_points:
+        pygame.draw.circle(screen, "blue", point, 2)  # Small blue dot  
 
     text_surface = font.render(f"x_speed: {ball1.x_speed:.2f}, y_speed: {ball1.y_speed:.2f}, acc: {ball1.gravity_pull(ball_main)[2]:.2f}, Force: {ball1.mass*ball1.gravity_pull(ball_main)[2]:.2f}", True, "aqua")
     screen.blit(text_surface, (10, 10))
