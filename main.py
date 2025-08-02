@@ -6,14 +6,14 @@ pygame.font.init()
 font = pygame.font.SysFont('Arial', 20)
 
 WIDTH, HEIGHT = 1600, 1000
-fps = 165
+fps = 90
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 timer = pygame.time.Clock()
 
 # game constants
 wall_thickness = 10
 gravity = 9.81*0.01  # Gravitational field strength 
-G = 6.67e1*1.5  # Gravitational constant
+G = 6.67e1  # Gravitational constant
 bounce_stop = 0.6  # Speed threshold for bouncing to stop
 
 class Ball:
@@ -28,6 +28,7 @@ class Ball:
         self.x_speed = x_speed  
         self.id = id
         self.cicle = ''
+        self.selected = False
 
     def draw(self):
         self.circle = pygame.draw.circle(screen, self.color, (self.x_pos, self.y_pos), self.radius)
@@ -54,9 +55,20 @@ class Ball:
 
         return [self.y_speed, self.x_speed, acc]
     
-    def update_pos(self):
-        self.y_pos += self.y_speed
-        self.x_pos += self.x_speed
+    def update_pos(self, mouse):
+        if not self.selected:
+            self.y_pos += self.y_speed
+            self.x_pos += self.x_speed
+        else:
+            self.x_pos = mouse[0]
+            self.y_pos = mouse[1]
+
+    def check_select(self, pos):
+        self.selected = False
+        if self.circle.collidepoint(pos):
+            self.selected = True
+        return self.selected
+        
 
 def draw_walls():
     left = pygame.draw.line(screen, "white", (0, 0), (0, HEIGHT), wall_thickness)
@@ -78,11 +90,13 @@ run = True
 while run:
     timer.tick(fps)
     screen.fill("black")  # Fill the screen with black
+    mouse_coords = pygame.mouse.get_pos()  # Get mouse position
+
     walls = draw_walls()
     ball1.draw()  # Draw the ball
-    ball1.update_pos()
+    ball1.update_pos(mouse_coords)
     ball2.draw()  # Draw the second ball
-    ball2.update_pos()
+    ball2.update_pos(mouse_coords)
     # ball1.y_speed = ball1.check_gravity()  # Check gravity and update ball position
     ball1.y_speed = ball1.gravity_pull(ball_main)[0]  # Apply gravity pull from the second ball
     ball1.x_speed = ball1.gravity_pull(ball_main)[1]  # Apply gravity pull from the second ball
@@ -90,14 +104,15 @@ while run:
     ball2.x_speed = ball2.gravity_pull(ball_main)[1]  # Apply gravity pull from the second ball
     print(f"Ball 1 Position: ({ball1.x_pos}, {ball1.y_pos}), Speed: ({ball1.x_speed}, {ball1.y_speed})")
     ball_main.draw()  # Draw the second ball
+    ball_main.update_pos(mouse_coords)  # Update the main ball position based on mouse
 
     tracer1_points.append((int(ball1.x_pos), int(ball1.y_pos)))
     tracer2_points.append((int(ball2.x_pos), int(ball2.y_pos)))
 
     for point in tracer1_points:
-        pygame.draw.circle(screen, "yellow", point, 2)  # Small yellow dot
+        pygame.draw.circle(screen, "yellow", point, 1)  # Small yellow dot
     for point in tracer2_points:
-        pygame.draw.circle(screen, "blue", point, 2)  # Small blue dot  
+        pygame.draw.circle(screen, "blue", point, 1)  # Small blue dot  
 
     text_surface = font.render(f"x_speed: {ball1.x_speed:.2f}, y_speed: {ball1.y_speed:.2f}, acc: {ball1.gravity_pull(ball_main)[2]:.2f}, Force: {ball1.mass*ball1.gravity_pull(ball_main)[2]:.2f}", True, "aqua")
     screen.blit(text_surface, (10, 10))
@@ -105,6 +120,13 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if ball_main.check_select(event.pos):
+                active_select = True
+        if event.type == pygame.MOUSEBUTTONUP:
+            active_select = False
+            ball_main.check_select((-1000, -1000))  # Deselect the ball
 
     pygame.display.flip()  # Update the display
 
