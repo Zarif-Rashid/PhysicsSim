@@ -1,2 +1,2 @@
 # PhysicsSim
-![image](https://imgur.com/m9K7yv1)
+https://i.imgur.com/m9K7yv1.png
