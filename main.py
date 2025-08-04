@@ -5,8 +5,8 @@ pygame.font.init()
 
 font = pygame.font.SysFont('Arial', 20)
 
-WIDTH, HEIGHT = 1600, 1000
-fps = 90
+WIDTH, HEIGHT = 1920, 1000
+fps = 400
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 timer = pygame.time.Clock()
 
@@ -47,13 +47,14 @@ class Ball:
     
     def gravity_pull(self, other_ball):
         dist = math.sqrt((self.x_pos - other_ball.x_pos) ** 2 + (self.y_pos - other_ball.y_pos) ** 2)
+
         acc = (G * other_ball.mass) / (dist)**2  
         acc_y = acc * (other_ball.y_pos - self.y_pos) / dist
         acc_x = acc * (other_ball.x_pos - self.x_pos) / dist
         self.y_speed += acc_y
         self.x_speed += acc_x
 
-        return [self.y_speed, self.x_speed, acc]
+        return [self.y_speed, self.x_speed, acc==1, dist]
     
     def update_pos(self, mouse):
         if not self.selected:
@@ -79,9 +80,10 @@ def draw_walls():
     return wall_list
 
 ball1 = Ball(WIDTH/4,HEIGHT/4 + 100,5,'white', 50, 1, 0, 4.6, 1)    
-ball2 = Ball(WIDTH/2+200, HEIGHT/4 + 100, 5, 'blue', 50, 1, 0, -5, 2)
+ball2 = Ball(WIDTH/2+200, HEIGHT/4 + 100, 5, pygame.Color('#C1E1C1'), 50, 1, 0, -5, 2)
+# TODO code to add more balls 
 
-ball_main = Ball(WIDTH/2, HEIGHT/2, 10, 'red', 80, 0.9, 0, 0, 3)
+ball_main = Ball(WIDTH/2, HEIGHT/2, 10, pygame.Color('#FF6961'), 100, 0.9, 0, 0, 3)
 tracer1_points = []
 tracer2_points = []
 
@@ -100,6 +102,8 @@ while run:
     # ball1.y_speed = ball1.check_gravity()  # Check gravity and update ball position
     ball1.y_speed = ball1.gravity_pull(ball_main)[0]  # Apply gravity pull from the second ball
     ball1.x_speed = ball1.gravity_pull(ball_main)[1]  # Apply gravity pull from the second ball
+    # ball1.x_speed = ball1.gravity_pull(ball2)[1]  # Apply gravity pull from the second ball
+    # ball1.y_speed = ball1.gravity_pull(ball2)[0]  # Apply gravity pull from the second ball
     ball2.y_speed = ball2.gravity_pull(ball_main)[0]  # Apply gravity pull from the second ball
     ball2.x_speed = ball2.gravity_pull(ball_main)[1]  # Apply gravity pull from the second ball
     print(f"Ball 1 Position: ({ball1.x_pos}, {ball1.y_pos}), Speed: ({ball1.x_speed}, {ball1.y_speed})")
@@ -110,11 +114,11 @@ while run:
     tracer2_points.append((int(ball2.x_pos), int(ball2.y_pos)))
 
     for point in tracer1_points:
-        pygame.draw.circle(screen, "yellow", point, 1)  # Small yellow dot
+        pygame.draw.circle(screen, "white", point, 1)  # Small yellow dot
     for point in tracer2_points:
-        pygame.draw.circle(screen, "blue", point, 1)  # Small blue dot  
+        pygame.draw.circle(screen, pygame.Color("#C1E1C1"), point, 1)  # Small blue dot  
 
-    text_surface = font.render(f"x_speed: {ball1.x_speed:.2f}, y_speed: {ball1.y_speed:.2f}, acc: {ball1.gravity_pull(ball_main)[2]:.2f}, Force: {ball1.mass*ball1.gravity_pull(ball_main)[2]:.2f}", True, "aqua")
+    text_surface = font.render(f"x_speed: {ball1.x_speed:.2f}, y_speed: {ball1.y_speed:.2f}, acc: {ball1.gravity_pull(ball_main)[2]:.2f}, Force: {ball1.mass*ball1.gravity_pull(ball_main)[2]:.2f}, Distance: {ball1.gravity_pull(ball_main)[3]:.2f}", True, "aqua")
     screen.blit(text_surface, (10, 10))
 
     for event in pygame.event.get():
