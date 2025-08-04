@@ -6,7 +6,7 @@ pygame.font.init()
 font = pygame.font.SysFont('Arial', 20)
 
 WIDTH, HEIGHT = 1920, 1000
-fps = 400
+fps = 60
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 timer = pygame.time.Clock()
 
@@ -47,14 +47,27 @@ class Ball:
     
     def gravity_pull(self, other_ball):
         dist = math.sqrt((self.x_pos - other_ball.x_pos) ** 2 + (self.y_pos - other_ball.y_pos) ** 2)
+        min_dist = 1  # Prevent division by zero and huge forces
+        max_acc = 3   # Maximum allowed acceleration
+        max_speed = 27 # Maximum allowed speed
+        # clamping produces odd orbits but prevents instability
+
+        # Clamp distance to avoid huge forces
+        dist = max(dist, min_dist)
 
         acc = (G * other_ball.mass) / (dist)**2  
+        acc = min(acc, max_acc)  # Clamp acceleration
+
         acc_y = acc * (other_ball.y_pos - self.y_pos) / dist
         acc_x = acc * (other_ball.x_pos - self.x_pos) / dist
         self.y_speed += acc_y
         self.x_speed += acc_x
 
-        return [self.y_speed, self.x_speed, acc==1, dist]
+        # Clamp speeds
+        self.y_speed = max(-max_speed, min(self.y_speed, max_speed))
+        self.x_speed = max(-max_speed, min(self.x_speed, max_speed))
+
+        return [self.y_speed, self.x_speed, acc, dist]
     
     def update_pos(self, mouse):
         if not self.selected:
