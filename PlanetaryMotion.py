@@ -3,7 +3,7 @@ import math
 pygame.init()
 pygame.font.init()
 
-font = pygame.font.SysFont('Arial', 20)
+font = pygame.font.SysFont('Cascadia Code', 20)
 
 WIDTH, HEIGHT = 1920, 1000
 fps = 120
@@ -15,7 +15,7 @@ wall_thickness = 10
 gravity = 9.81*0.01  # Gravitational field strength 
 G = 6.67e1  # Gravitational constant
 bounce_stop = 0.6  # Speed threshold for bouncing to stop
-max_tracer = 100  # Maximum number of tracer points
+max_tracer = 150  # Maximum number of tracer points
 
 class Ball:
     def __init__(self, x_pos, y_pos, radius, color, mass, retention, x_speed, y_speed, id):
@@ -85,13 +85,13 @@ class Ball:
         return self.selected
         
 
-def draw_walls():
-    left = pygame.draw.line(screen, "white", (0, 0), (0, HEIGHT), wall_thickness)
-    right = pygame.draw.line(screen, "white", (WIDTH, 0), (WIDTH, HEIGHT), wall_thickness)
-    top = pygame.draw.line(screen, "white", (0, 0), (WIDTH, 0), wall_thickness)
-    bottom = pygame.draw.line(screen, "white", (0, HEIGHT), (WIDTH, HEIGHT), wall_thickness)
-    wall_list = [left, right, top, bottom]
-    return wall_list
+# def draw_walls():
+#     left = pygame.draw.line(screen, "white", (0, 0), (0, HEIGHT), wall_thickness)
+#     right = pygame.draw.line(screen, "white", (WIDTH, 0), (WIDTH, HEIGHT), wall_thickness)
+#     top = pygame.draw.line(screen, "white", (0, 0), (WIDTH, 0), wall_thickness)
+#     bottom = pygame.draw.line(screen, "white", (0, HEIGHT), (WIDTH, HEIGHT), wall_thickness)
+#     wall_list = [left, right, top, bottom]
+#     return wall_list
 
 ball1 = Ball(WIDTH/4,HEIGHT/4 + 100,5,'white', 50, 1, 0, 4.6, 1)    
 ball2 = Ball(WIDTH/2+200, HEIGHT/4 + 100, 5, pygame.Color('#C1E1C1'), 50, 1, 0, -5, 2)
@@ -107,10 +107,10 @@ tracer3_points = []
 run = True
 while run:
     timer.tick(fps)
-    screen.fill("black")  # Fill the screen with black
+    screen.fill(pygame.Color('#111111'))  # Fill the screen with black
     mouse_coords = pygame.mouse.get_pos()  # Get mouse position
 
-    walls = draw_walls()
+    # draw_walls()  # Draw the walls (if needed, uncomment this line)
     ball1.draw()  # Draw the ball
     ball1.update_pos(mouse_coords)
     ball2.draw()  # Draw the second ball
