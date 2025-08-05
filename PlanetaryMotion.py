@@ -6,7 +6,7 @@ pygame.font.init()
 font = pygame.font.SysFont('Arial', 20)
 
 WIDTH, HEIGHT = 1920, 1000
-fps = 60
+fps = 120
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 timer = pygame.time.Clock()
 
@@ -15,6 +15,7 @@ wall_thickness = 10
 gravity = 9.81*0.01  # Gravitational field strength 
 G = 6.67e1  # Gravitational constant
 bounce_stop = 0.6  # Speed threshold for bouncing to stop
+max_tracer = 100  # Maximum number of tracer points
 
 class Ball:
     def __init__(self, x_pos, y_pos, radius, color, mass, retention, x_speed, y_speed, id):
@@ -94,11 +95,13 @@ def draw_walls():
 
 ball1 = Ball(WIDTH/4,HEIGHT/4 + 100,5,'white', 50, 1, 0, 4.6, 1)    
 ball2 = Ball(WIDTH/2+200, HEIGHT/4 + 100, 5, pygame.Color('#C1E1C1'), 50, 1, 0, -5, 2)
+ball3 = Ball(WIDTH/2+100, HEIGHT/4 + 100, 5, pygame.Color('#C1E1C1'), 60, 1, 0, -5, 3)
 # TODO code to add more balls 
 
 ball_main = Ball(WIDTH/2, HEIGHT/2, 10, pygame.Color('#FF6961'), 100, 0.9, 0, 0, 3)
 tracer1_points = []
 tracer2_points = []
+tracer3_points = []
 
 
 run = True
@@ -112,6 +115,8 @@ while run:
     ball1.update_pos(mouse_coords)
     ball2.draw()  # Draw the second ball
     ball2.update_pos(mouse_coords)
+    ball3.draw()  # Draw the third ball
+    ball3.update_pos(mouse_coords)
     # ball1.y_speed = ball1.check_gravity()  # Check gravity and update ball position
     ball1.y_speed = ball1.gravity_pull(ball_main)[0]  # Apply gravity pull from the second ball
     ball1.x_speed = ball1.gravity_pull(ball_main)[1]  # Apply gravity pull from the second ball
@@ -119,17 +124,29 @@ while run:
     # ball1.y_speed = ball1.gravity_pull(ball2)[0]  # Apply gravity pull from the second ball
     ball2.y_speed = ball2.gravity_pull(ball_main)[0]  # Apply gravity pull from the second ball
     ball2.x_speed = ball2.gravity_pull(ball_main)[1]  # Apply gravity pull from the second ball
+    ball3.y_speed = ball3.gravity_pull(ball_main)[0]  # Apply gravity pull from the second ball
+    ball3.x_speed = ball3.gravity_pull(ball_main)[1]  # Apply gravity pull from the second ball
     print(f"Ball 1 Position: ({ball1.x_pos}, {ball1.y_pos}), Speed: ({ball1.x_speed}, {ball1.y_speed})")
     ball_main.draw()  # Draw the second ball
     ball_main.update_pos(mouse_coords)  # Update the main ball position based on mouse
-
+    
     tracer1_points.append((int(ball1.x_pos), int(ball1.y_pos)))
     tracer2_points.append((int(ball2.x_pos), int(ball2.y_pos)))
+    tracer3_points.append((int(ball3.x_pos), int(ball3.y_pos)))
+
+    if len(tracer1_points) > max_tracer:  # Limit the number of tracer points
+        tracer1_points.pop(0)
+    if len(tracer2_points) > max_tracer:  # Limit the number of tracer points
+        tracer2_points.pop(0)
+    if len(tracer3_points) > max_tracer:  # Limit the number of tracer points
+        tracer3_points.pop(0)
 
     for point in tracer1_points:
         pygame.draw.circle(screen, "white", point, 1)  # Small yellow dot
     for point in tracer2_points:
-        pygame.draw.circle(screen, pygame.Color("#C1E1C1"), point, 1)  # Small blue dot  
+        pygame.draw.circle(screen, pygame.Color("#C1E1C1"), point, 1)  # Small blue dot 
+    for point in tracer3_points:
+        pygame.draw.circle(screen, pygame.Color("#FF6961"), point, 1) 
 
     text_surface = font.render(f"x_speed: {ball1.x_speed:.2f}, y_speed: {ball1.y_speed:.2f}, acc: {ball1.gravity_pull(ball_main)[2]:.2f}, Force: {ball1.mass*ball1.gravity_pull(ball_main)[2]:.2f}, Distance: {ball1.gravity_pull(ball_main)[3]:.2f}", True, "aqua")
     screen.blit(text_surface, (10, 10))
