@@ -1,4 +1,5 @@
 import pygame
+import math
 
 pygame.init()
 pygame.font.init()
@@ -12,6 +13,18 @@ timer = pygame.time.Clock()
 
 # game constants
 gravity = 9.81*0.01  # Gravitational field strength 
+
+# Pendulum parameters
+origin = (WIDTH // 2, HEIGHT // 4)
+length = 300
+angle = math.pi / 4  # Initial angle (45 degrees)
+angle_vel = 0
+angle_acc = 0
+bob_radius = 30
+
+def draw_pendulum(origin, bob_pos):
+    pygame.draw.line(screen, "white", origin, bob_pos, 4)
+    pygame.draw.circle(screen, "red", bob_pos, bob_radius)
 
 # class Ball:
 #     def __init__(self, x_pos, y_pos, radius, color, mass, retention, x_speed, y_speed, id):
@@ -86,12 +99,25 @@ gravity = 9.81*0.01  # Gravitational field strength
 run = True
 while run:
     timer.tick(fps)
-    screen.fill("black")  # Fill the screen with black
+    screen.fill("black")
+
+    # Pendulum physics
+    angle_acc = -gravity / length * math.sin(angle)
+    angle_vel += angle_acc
+    angle_vel *= 0.999  # Damping
+    angle += angle_vel
+
+    # Calculate bob position
+    bob_x = origin[0] + length * math.sin(angle)
+    bob_y = origin[1] + length * math.cos(angle)
+    bob_pos = (int(bob_x), int(bob_y))
+
+    draw_pendulum(origin, bob_pos)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
 
-    pygame.display.flip()  # Update the display
+    pygame.display.flip()
 
 pygame.quit()  # Quit pygame when the loop ends
